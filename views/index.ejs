@@ -28,21 +28,21 @@
                 <button type="submit" class="search-button">Search</button>
             </form>
         </div>
-        <!-- No students matched on search -->
+
         <dialog id="no-result-dialog" class="no-result-dialog" 
-             <% if (no_result) { %> open <% } %> >
+             <% if (typeof no_result !== 'undefined' && no_result) { %> open <% } %> >
              <h2>No student matched your search criteria!</h2>
              <button onclick="closeNoResultDialog()">Close</button>
         </dialog>
-
-        <!-- Student with email exists -->
+        
         <dialog id="student-exists-dialog" class="student-exists-dialog" 
              <% if (message) { %> open <% } %> >
              <h2>Student with email already exists!</h2>
              <button onclick="closeStudentExistsDialog()">Close</button>
         </dialog>
 
-        <! -- If search matches a student -->
+        
+
         <dialog id="search-dialog" class="search-dialog">
             <h2 style="font-family: Montserrat">Search Results</h2>
             <div id="search-results">
@@ -65,7 +65,6 @@
                                     <td><%= student.course %></td>
                                     <td><%= student.email %></td>
                                     <td class="action-btn">
-
                                         <!-- Update Form -->
                                         <button onclick=show_update_dialog() class="onclick-button">Update</button>
                                             <dialog id="update-dialog" style="border-radius: 10px">
@@ -92,15 +91,15 @@
                                     </td>
                                 </tr>
                             </tbody>
+                            
                         </table>
                     <% }); %>
                 <% } else { %>
-                    <p>No student matched your search criteria.</p> // walato
+                    <p>No student matched your search criteria.</p>
                 <% } %>
             </div>
             <button onclick=close_search_dialog()>Close</button>
         </dialog>
-
         <!-- Student Data Table -->
         <div class="data-table">
             <table class="table" border="1" style="border-radius:6px">
@@ -124,7 +123,6 @@
                         <td class="fixed-width"><%= student.course %></td>
                         <td class="fixed-width"><%= student.email %></td>
                         <td class="action-btn">
-
                             <!-- Update Form -->
                             <button onclick=show_update_dialog() class="onclick-button">Update</button>
                                 <dialog id="update-dialog" style="border-radius: 10px">
@@ -157,6 +155,8 @@
         </div>
     </body>
     <script>
+        console.log('no_result:', "<%= no_result %>");
+
         const update_dialog = document.getElementById("update-dialog");
         const delete_dialog = document.getElementById("delete-dialog");
         const error_dialog = document.getElementById("error-dialog");
@@ -209,9 +209,11 @@
             error_dialog.close();
             window.location.href = '/';
         }
-        
+        // Check if there is an error and show the dialog
         document.addEventListener('DOMContentLoaded', function() {
+        // Pass the error message from EJS to a JavaScript variable
         const error = "<%= typeof error !== 'undefined' && error !== null ? error : '' %>";
+        
         if (error) {
             show_error_dialog();  // Show dialog if error exists
         }
