@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Student Management System</title>
+        <link rel="stylesheet" href="/style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    </head>
+    <body>
+        <div class="headline">
+            <h1 class="headline-title">Student Management System</h1>
+        </div>
+        
+        <!-- Add Student Section -->
+        <div class="add-bar">
+            <form action="/add" method="POST">
+                <input class="add-name" type="text" name="name" placeholder="Full Name" required>
+                <input class="add-year" type="number" name="year" placeholder="Year" min="1" max="4" required>
+                <input class="add-course" type="text" name="course"  placeholder="Course" required>
+                <input class="add-email" type="email" name="email" placeholder="E-mail" required>
+                <button type="submit" class="add-button">Add</button>
+            </form>
+            <form action="/search" method="GET">
+                <input class="search-name" type="text" name="search_name" placeholder="Search by name" required>
+                <button type="submit" class="search-button">Search</button>
+            </form>
+        </div>
+
+        <dialog id="no-result-dialog" class="no-result-dialog" 
+             <% if (no_result) { %> open <% } %> >
+             <h2>No student matched your search criteria!</h2>
+             <button onclick="closeNoResultDialog()">Close</button>
+        </dialog>
+        
+        <dialog id="student-exists-dialog" class="student-exists-dialog" 
+             <% if (message) { %> open <% } %> >
+             <h2>Student with email already exists!</h2>
+             <button onclick="closeStudentExistsDialog()">Close</button>
+        </dialog>
+
+        
+
+        <dialog id="search-dialog" class="search-dialog">
+            <h2 style="font-family: Montserrat">Search Results</h2>
+            <div id="search-results">
+                <% if (search_results && search_results.length > 0) { %>
+                    <% search_results.forEach(student => { %>
+                        <table class="search-table" border="1">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Year</th>
+                                    <th>Course</th>
+                                    <th>Email</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><%= student.name %></td>
+                                    <td><%= student.year %></td>
+                                    <td><%= student.course %></td>
+                                    <td><%= student.email %></td>
+                                    <td class="action-btn">
+                                        <!-- Update Form -->
+                                        <button onclick=show_update_dialog() class="onclick-button">Update</button>
+                                            <dialog id="update-dialog" style="border-radius: 10px">
+                                                <h2>Update</h2>
+                                                <form action="/update/<%- student.id %>" method="POST">
+                                                    <input class="update-name" type="text" name="name" placeholder="Full Name" required>
+                                                    <input class="update-year" type="number" name="year" placeholder="Year" required>
+                                                    <input class="update-course" type="text" name="course" placeholder="Course" required>
+                                                    <input class="update-email" type="email" name="email" placeholder="E-mail" required>
+                                                    <button type="submit" class="button">Update</button>
+                                                    <button onclick = close_update_dialog() type="button" class="button">Cancel</button>
+                                                </form>
+                                            </dialog>
+                                        
+                                        <!-- Delete Form -->
+                                         <button onclick=show_delete_dialog() class="onclick-button">Delete</button>
+                                            <dialog id="delete-dialog" class="delete-dialog">
+                                                <h2>Are you sure you want to delete this student?</h2>
+                                                <form action="/delete/<%= student.id %>" method="POST" style="display:inline;">
+                                                    <button class="delete-button" type="submit">Yes</button>
+                                                    <button onclick=close_delete_dialog() type="button">No</button>
+                                                </form>
+                                            </dialog>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            
+                        </table>
+                    <% }); %>
+                <% } else { %>
+                    <p>No student matched your search criteria.</p>
+                <% } %>
+            </div>
+            <button onclick=close_search_dialog()>Close</button>
+        </dialog>
+        <!-- Student Data Table -->
+        <div class="data-table">
+            <table class="table" border="1" style="border-radius:6px">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Student Name</th>
+                        <th>Year</th>
+                        <th>Course</th>
+                        <th>Email</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (student && student.length > 0) { %>
+                    <% student.forEach(student => { %>
+                    <tr>
+                        <td class="fixed-width"><%= student.id %></td>
+                        <td class="fixed-width"><%= student.name %></td>
+                        <td class="fixed-width"><%= student.year %></td>
+                        <td class="fixed-width"><%= student.course %></td>
+                        <td class="fixed-width"><%= student.email %></td>
+                        <td class="action-btn">
+                            <!-- Update Form -->
+                            <button onclick=show_update_dialog() class="onclick-button">Update</button>
+                                <dialog id="update-dialog" style="border-radius: 10px">
+                                    <h2>Update</h2>
+                                    <form action="/update/<%- student.id %>" method="POST">
+                                        <input class="update-name" type="text" name="name" placeholder="Full Name" required>
+                                        <input class="update-year" type="number" name="year" placeholder="Year" required>
+                                        <input class="update-course" type="text" name="course" placeholder="Course" required>
+                                        <input class="update-email" type="email" name="email" placeholder="E-mail" required>
+                                        <button type="submit" class="button">Update</button>
+                                        <button onclick = close_update_dialog() type="button" class="button">Cancel</button>
+                                    </form>
+                                </dialog>
+                            
+                            <!-- Delete Form -->
+                             <button onclick=show_delete_dialog() class="onclick-button">Delete</button>
+                                <dialog id="delete-dialog" class="delete-dialog">
+                                    <h2>Are you sure you want to delete this student?</h2>
+                                    <form action="/delete/<%= student.id %>" method="POST" style="display:inline;">
+                                        <button class="delete-button" type="submit">Yes</button>
+                                        <button onclick=close_delete_dialog() type="button">No</button>
+                                    </form>
+                                </dialog>
+                        </td>
+                    </tr>
+                    <% }); %>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+    </body>
+    <script>
+        console.log('no_result:', "<%= no_result %>");
+
+        const update_dialog = document.getElementById("update-dialog");
+        const delete_dialog = document.getElementById("delete-dialog");
+        const error_dialog = document.getElementById("error-dialog");
+        const search_dialog = document.getElementById("search-dialog");
+        const search_results = "<%= Array.isArray(search_results) && search_results.length > 0 ? 'true' : '' %>";
+
+        if (search_results) {
+            search_dialog.showModal();
+        }
+
+        function closeNoResultDialog() {
+            const dialog = document.getElementById("no-result-dialog");
+            dialog.close(); // Close the dialog
+            window.location.href='/';
+        }
+        
+        function closeStudentExistsDialog() {
+            const dialog = document.getElementById("student-exists-dialog");
+            dialog.close(); // Close the dialog
+            window.location.href='/';
+        }
+
+
+        function close_search_dialog(){
+            search_dialog.close();
+            window.location.href = '/';
+        }
+
+        function show_update_dialog(){
+            update_dialog.showModal();
+        }
+
+        function show_delete_dialog(){
+            delete_dialog.showModal();
+        }
+
+        function close_update_dialog(){
+            update_dialog.close();
+        }
+
+        function close_delete_dialog(){
+            delete_dialog.close();
+        }
+
+        function show_error_dialog(){
+            error_dialog.showModal();
+        }
+
+        function close_error_dialog(){
+            error_dialog.close();
+            window.location.href = '/';
+        }
+        // Check if there is an error and show the dialog
+        document.addEventListener('DOMContentLoaded', function() {
+        // Pass the error message from EJS to a JavaScript variable
+        const error = "<%= typeof error !== 'undefined' && error !== null ? error : '' %>";
+        
+        if (error) {
+            show_error_dialog();  // Show dialog if error exists
+        }
+
+        function validateForm() {
+            let isValid = true;
+            
+            // Reset all error messages
+            document.querySelectorAll('.error-message').forEach(function(el) {
+                el.style.display = 'none';
+            });
+        
+            // Validate name (must not be empty)
+            const name = document.querySelector('.add-name').value;
+            if (!name.trim()) {
+                document.getElementById('name-error').style.display = 'block';
+                document.getElementById('name-error').innerText = 'Full Name is required.';
+                isValid = false;
+            }
+        
+            // Validate year (must be between 1 and 4)
+            const year = document.querySelector('.add-year').value;
+            if (year < 1 || year > 4) {
+                document.getElementById('year-error').style.display = 'block';
+                document.getElementById('year-error').innerText = 'Year must be between 1 and 4.';
+                isValid = false;
+            }
+        
+            // Validate course (must not be empty)
+            const course = document.querySelector('.add-course').value;
+            if (!course.trim()) {
+                document.getElementById('course-error').style.display = 'block';
+                document.getElementById('course-error').innerText = 'Course is required.';
+                isValid = false;
+            }
+        
+            // Validate email (must be a valid email)
+            const email = document.querySelector('.add-email').value;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!email.match(emailRegex)) {
+                document.getElementById('email-error').style.display = 'block';
+                document.getElementById('email-error').innerText = 'Valid Email is required.';
+                isValid = false;
+            }
+        
+            return isValid; // Prevent form submission if validation fails
+        }
+        
+    });
+
+    </script>
+</html>

@@ -1,0 +1,151 @@
+
+body{
+    font-family: Montserrat;
+    font-weight: 400;
+}
+
+.headline-title{
+    font-family: Montserrat;
+    text-align: center;
+}
+
+.headline{
+    background-color: rgb(31, 189, 100);
+    border-radius: 10px;
+    padding: 2px 2px;
+    margin-bottom: 20px;
+}
+
+.add-bar{
+    width: 50%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    border: 1px solid #f5c6cb;
+    margin-top: 20px;
+}
+
+.data-table{
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.table{
+    width: 90%;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.search-table{
+    width: 70%;
+    margin: 0 auto;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.onclick-button{
+    font-family: Montserrat;
+    background-color:rgb(65, 199, 50);
+    width: 150px;
+    cursor: pointer;
+    transition: 0.15s;
+    margin-bottom: 10px;
+    padding: 12px 12px;
+}
+
+.search-dialog{
+    padding: 10px 10px;
+    border-radius:  10px;
+}
+
+.delete-dialog{
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.fixed-width{
+    width: 200px;
+}
+
+.no-result-dialog {
+    width: 80%;
+    padding: 20px;
+    background-color: #f44336;
+    color: white;
+    border-radius: 10px;
+    text-align: center;
+    top: 35%;
+}
+
+body{
+    font-family: Montserrat;
+    font-weight: 500;
+}
+
+button{
+    font-family: Montserrat;
+    background-color:rgb(65, 199, 50);
+    width: 100px;
+    cursor: pointer;
+    transition: 0.15s;
+    margin-right: 5px;
+    margin-top: 5px;
+    border-radius: 6px;
+    padding: 5px 5px;
+ }
+ 
+button:hover{
+     opacity: 0.7;
+ }
+ 
+button:active{
+     opacity: 0.5;
+ }
+
+body{
+    background-color: antiquewhite;
+}
+
+.action-btn{
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+}
+
+th, td{
+    width: 10%;
+    padding: 15px 15px 10px;
+    font-family: Montserrat;
+    margin-right: 10px;
+    border-radius: 6px;
+    padding: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+input {
+    background-color: bisque;
+    font-family: Montserrat;
+    border-radius: 6px;
+    width: 150px;
+    margin-right: 10px;
+    margin-top: 10px;
+    padding: 5px 5px;
+}
+
+h2{
+    vertical-align: top;
+    margin-top: 0;
+}
+
+table{
+    table-layout: fixed;
+}
