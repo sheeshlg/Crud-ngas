@@ -38,13 +38,13 @@ app.get('/', (req, res) => {
             return res.render("index", { student: [], search_results: [], message: null });
         }
 
-        const no_results = results.length === 0;
+        //const no_results = results.length === 0;
 
         res.render('index', {
             student: results, // All student records
             search_results: [], // No search results for the default page
             message: null, // No message for the default page
-            no_result : no_results,
+            no_result : false,
         });
     });
 });
