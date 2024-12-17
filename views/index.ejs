@@ -7,21 +7,42 @@
         <link rel="stylesheet" href="/style.css">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900&display=swap" rel="stylesheet">
     </head>
     <body>
         <div class="headline">
             <h1 class="headline-title">Student Management System</h1>
         </div>
-        
+
         <!-- Add Student Section -->
         <div class="add-bar">
-            <form action="/add" method="POST">
-                <input class="add-name" type="text" name="name" placeholder="Full Name" required>
+            <form action="/add" method="POST" id="add-student-form">
+                <input 
+                    class="add-name" 
+                    type="text" 
+                    name="name" 
+                    placeholder="Full Name" 
+                    pattern="^[a-zA-Z\sIVXLCDM,\'\-\u2014]+$" 
+                    title="Name must only contain letters, spaces, commas, apostrophes, hyphens, em dashes, and optional Roman numerals (e.g., John Doe III, O'Connor)" 
+                    required>
+                <p id="name-error" style="color: red; display: none;">Name must only contain letters, spaces, commas, apostrophes, hyphens, em dashes, and optional Roman numerals.</p>
+
                 <input class="add-year" type="number" name="year" placeholder="Year" min="1" max="4" required>
-                <input class="add-course" type="text" name="course"  placeholder="Course" required>
-                <input class="add-email" type="email" name="email" placeholder="E-mail" required>
-                <button type="submit" class="add-button">Add</button>
+                <input class="add-course" id="courseInput" type="text" name="course"  placeholder="Course" required>
+                <input 
+                    class="add-email" 
+                    type="email" 
+                    name="email" 
+                    placeholder="E-mail" 
+                    pattern="^(?!.*\.\.)([a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*)@[a-zA-Z0-9]+\.[a-zA-Z]{2,}$" 
+                    title="Email must contain only letters, numbers, and periods. No special characters like &amp;, =, _, ', -, +, ,, &lt;, &gt;, or multiple consecutive periods are allowed." 
+                    required>
+                <p id="email-error" style="color: red; display: none;">Invalid email format. Ensure it contains only letters, numbers, and periods, with no consecutive periods or special characters.</p>
+                <button id="validateBtn">Add</button>
+                <p id="errorMessage" class="error"></p>
+                <p id="selectedCourse"></p>
+
+                <!-- <button type="submit" class="add-button">Add</button> -->
             </form>
             <form action="/search" method="GET">
                 <input class="search-name" type="text" name="search_name" placeholder="Search by name" required>
@@ -41,7 +62,11 @@
              <button onclick="closeStudentExistsDialog()">Close</button>
         </dialog>
 
-        
+        <dialog id="error-dialog" class="error-dialog">
+            <h2>An error occurred!</h2>
+            <p>Please try again later or contact support.</p>
+            <button onclick="close_error_dialog()">Close</button>
+        </dialog>
 
         <dialog id="search-dialog" class="search-dialog">
             <h2 style="font-family: Montserrat">Search Results</h2>
@@ -66,40 +91,61 @@
                                     <td><%= student.email %></td>
                                     <td class="action-btn">
                                         <!-- Update Form -->
-                                        <button onclick=show_update_dialog() class="onclick-button">Update</button>
+                                        <button onclick="show_update_dialog()" class="onclick-button">Update</button>
                                             <dialog id="update-dialog" style="border-radius: 10px">
                                                 <h2>Update</h2>
                                                 <form action="/update/<%- student.id %>" method="POST">
-                                                    <input class="update-name" type="text" name="name" placeholder="Full Name" required>
-                                                    <input class="update-year" type="number" name="year" placeholder="Year" required>
-                                                    <input class="update-course" type="text" name="course" placeholder="Course" required>
-                                                    <input class="update-email" type="email" name="email" placeholder="E-mail" required>
-                                                    <button type="submit" class="button">Update</button>
-                                                    <button onclick = close_update_dialog() type="button" class="button">Cancel</button>
+                                                    <input 
+                                                        class="update-name" 
+                                                        type="text" 
+                                                        name="name" 
+                                                        placeholder="Full Name" 
+                                                        pattern="^[a-zA-Z\sIVXLCDM,\'\-\u2014]+$" 
+                                                        title="Name must only contain letters, spaces, commas, apostrophes, hyphens, em dashes, and optional Roman numerals." 
+                                                        required>
+                                                    <input class="update-year" type="number" name="year" placeholder="Year" min="1" max="4" required>
+                                                    <input class="update-course" type="text" id="courseInput" name="course" placeholder="Course" required>
+                                                    <input 
+                                                        class="update-email" 
+                                                        type="email" 
+                                                        name="email" 
+                                                        placeholder="E-mail" 
+                                                        pattern="^(?!.*\.\.)([a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*)@[a-zA-Z0-9]+\.[a-zA-Z]{2,}$" 
+                                                        title="Email must contain only letters, numbers, and periods. No special characters like &amp;, =, _, ', -, +, ,, &lt;, &gt;, or multiple consecutive periods are allowed." 
+                                                        required>
+                                                    <button id="validateBtn" class="button">Update</button>
+                                                    <button onclick="close_update_dialog()" type="button" class="button">Cancel</button>
                                                 </form>
+
+                                                <dialog id="student-exists-dialog" class="student-exists-dialog" 
+                                                <% if (message) { %> open <% } %> >
+                                                <h2>Student with email already exists!</h2>
+                                                <button onclick="closeStudentExistsDialog()">Close</button>
+                                                </dialog>
+
                                             </dialog>
                                         
                                         <!-- Delete Form -->
-                                         <button onclick=show_delete_dialog() class="onclick-button">Delete</button>
+                                         <button onclick="show_delete_dialog()" class="onclick-button">Delete</button>
                                             <dialog id="delete-dialog" class="delete-dialog">
                                                 <h2>Are you sure you want to delete this student?</h2>
                                                 <form action="/delete/<%= student.id %>" method="POST" style="display:inline;">
                                                     <button class="delete-button" type="submit">Yes</button>
-                                                    <button onclick=close_delete_dialog() type="button">No</button>
+                                                    <button onclick="close_delete_dialog()" type="button">No</button>
                                                 </form>
                                             </dialog>
                                     </td>
                                 </tr>
                             </tbody>
-                            
                         </table>
                     <% }); %>
                 <% } else { %>
                     <p>No student matched your search criteria.</p>
                 <% } %>
             </div>
-            <button onclick=close_search_dialog()>Close</button>
+            <button onclick="close_search_dialog()">Close</button>
         </dialog>
+
         <!-- Student Data Table -->
         <div class="data-table">
             <table class="table" border="1" style="border-radius:6px">
@@ -124,26 +170,52 @@
                         <td class="fixed-width"><%= student.email %></td>
                         <td class="action-btn">
                             <!-- Update Form -->
-                            <button onclick=show_update_dialog() class="onclick-button">Update</button>
+                            <button onclick="show_update_dialog()" class="onclick-button">Update</button>
                                 <dialog id="update-dialog" style="border-radius: 10px">
                                     <h2>Update</h2>
                                     <form action="/update/<%- student.id %>" method="POST">
-                                        <input class="update-name" type="text" name="name" placeholder="Full Name" required>
-                                        <input class="update-year" type="number" name="year" placeholder="Year" required>
+                                        <input 
+                                            class="update-name" 
+                                            type="text" 
+                                            name="name" 
+                                            placeholder="Full Name" 
+                                            pattern="^[a-zA-Z\sIVXLCDM,\'\-\u2014]+$" 
+                                            title="Name must only contain letters, spaces, commas, apostrophes, hyphens, em dashes, and optional Roman numerals." 
+                                            required>
+                                        <input class="update-year" type="number" name="year" placeholder="Year" min="1" max="4" required>
                                         <input class="update-course" type="text" name="course" placeholder="Course" required>
-                                        <input class="update-email" type="email" name="email" placeholder="E-mail" required>
-                                        <button type="submit" class="button">Update</button>
-                                        <button onclick = close_update_dialog() type="button" class="button">Cancel</button>
+                                        <input 
+                                            class="update-email" 
+                                            type="email" 
+                                            name="email" 
+                                            placeholder="E-mail" 
+                                            pattern="^(?!.*\.\.)([a-zA-Z0-9]+(?:\.[a-zA-Z0-9]+)*)@[a-zA-Z0-9]+\.[a-zA-Z]{2,}$" 
+                                            title="Email must contain only letters, numbers, and periods. No special characters like &amp;, =, _, ', -, +, ,, &lt;, &gt;, or multiple consecutive periods are allowed." 
+                                            required>
+                                        <button id="validateBtn" class="button">Update</button>
+                                        <button onclick="close_update_dialog()" type="button" class="button">Cancel</button>
                                     </form>
+
+                                    <dialog id="student-exists-dialog" class="student-exists-dialog" 
+                                    <% if (message) { %> open <% } %> >
+                                                    <h2>Student with email already exists!</h2>
+                                                    <button onclick="closeStudentExistsDialog()">Close</button>
+                                                    </dialog>
+                                </dialog>
+
+                                <dialog id="student-exists-dialog" class="student-exists-dialog" 
+                                 <% if (message) { %> open <% } %> >
+                                <h2>Student with email already exists!</h2>
+                                <button onclick="closeStudentExistsDialog()">Close</button>
                                 </dialog>
                             
                             <!-- Delete Form -->
-                             <button onclick=show_delete_dialog() class="onclick-button">Delete</button>
+                             <button onclick="show_delete_dialog()" class="onclick-button">Delete</button>
                                 <dialog id="delete-dialog" class="delete-dialog">
                                     <h2>Are you sure you want to delete this student?</h2>
                                     <form action="/delete/<%= student.id %>" method="POST" style="display:inline;">
                                         <button class="delete-button" type="submit">Yes</button>
-                                        <button onclick=close_delete_dialog() type="button">No</button>
+                                        <button onclick="close_delete_dialog()" type="button">No</button>
                                     </form>
                                 </dialog>
                         </td>
@@ -153,72 +225,232 @@
                 </tbody>
             </table>
         </div>
+
+        <script>
+
+            console.log('no_result:', "<%= no_result %>");
+
+            const update_dialog = document.getElementById("update-dialog");
+            const delete_dialog = document.getElementById("delete-dialog");
+            const error_dialog = document.getElementById("error-dialog");
+            const search_dialog = document.getElementById("search-dialog");
+            const search_results = "<%= Array.isArray(search_results) && search_results.length > 0 ? 'true' : '' %>";
+
+            if (search_results) {
+                search_dialog.showModal();
+            }
+
+            function closeNoResultDialog() {
+                const dialog = document.getElementById("no-result-dialog");
+                dialog.close(); // Close the dialog
+                window.location.href='/';
+            }
+
+            function closeStudentExistsDialog() {
+                const dialog = document.getElementById("student-exists-dialog");
+                dialog.close(); // Close the dialog
+                window.location.href='/';
+            }
+
+
+            function close_search_dialog(){
+                search_dialog.close();
+                window.location.href = '/';
+            }
+
+            function show_update_dialog(){
+                update_dialog.showModal();
+            }
+
+            function show_delete_dialog(){
+                delete_dialog.showModal();
+            }
+
+            function close_update_dialog(){
+                update_dialog.close();
+            }
+
+            function close_delete_dialog(){
+                delete_dialog.close();
+            }
+
+            function show_error_dialog(){
+                error_dialog.showModal();
+            }
+
+            function close_error_dialog(){
+                error_dialog.close();
+                window.location.href = '/';
+            }
+            // Check if there is an error and show the dialog
+            document.addEventListener('DOMContentLoaded', function() {
+            // Pass the error message from EJS to a JavaScript variable
+            const error = "<%= typeof error !== 'undefined' && error !== null ? error : '' %>";
+
+            if (error) {
+                show_error_dialog();  // Show dialog if error exists
+            }
+
+
+            const validCourses = [
+            "BSA",
+            "BSAGRI",
+            "BSDC",
+            "BSES",
+            "BSFT",
+            "BSF",
+            "BSFISH",
+            "BSMB",
+            "ABCOMM",
+            "ABEL",
+            "ABSOC",
+            "BSBIO",
+            "BSMATH",
+            "BSMET",
+            "BSP",
+            "BSACT",
+            "BSHRM",
+            "BSMKTG",
+            "BSCOOP",
+            "BSECON",
+            "BSENT",
+            "BSHM",
+            "BSTM",
+            "BSCS",
+            "BSIT",
+            "BSABE",
+            "BSCER",
+            "BSCHE",
+            "BSCIV",
+            "BSCPE",
+            "BSEE",
+            "BSECE",
+            "BSME",
+            "BSN",
+            "BSPH",
+            "BSPT",
+            "BSAT",
+            "BSITEC",
+            "BSCDT",
+            "BSCT",
+            "BSET",
+            "BSELT",
+            "BSFPM",
+            "BSGT",
+            "BCAED",
+            "BECE",
+            "BEED",
+            "BPED",
+            "BSEDENG",
+            "BSEDFIL",
+            "BSEDMATH",
+            "BSEDSCI",
+            "BSEDSOC",
+            "BSEDVE",
+            "BSPED",
+            "BTVTED",
+            "BTVTEDAUTO",
+            "BTVTEDCHS",
+            "BTVTEDDRAFT",
+            "BTVTEDELT",
+            "BTVTEDFSM",
+            "BTVTEDGAR",
+            "BTLED",
+            "BTLEDAGFISH",
+            "BTLEDHE",
+            "BTLEDICT",
+            "BTLEDIA",
+            "DVM","BSA",
+            "BSAGRI",
+            "BSDC",
+            "BSES",
+            "BSFT",
+            "BSF",
+            "BSFISH",
+            "BSMB",
+            "ABCOMM",
+            "ABEL",
+            "ABSOC",
+            "BSBIO",
+            "BSMATH",
+            "BSMET",
+            "BSP",
+            "BSACT",
+            "BSHRM",
+            "BSMKTG",
+            "BSCOOP",
+            "BSECON",
+            "BSENT",
+            "BSHM",
+            "BSTM",
+            "BSCS",
+            "BSIT",
+            "BSABE",
+            "BSCER",
+            "BSCHE",
+            "BSCIV",
+            "BSCPE",
+            "BSEE",
+            "BSECE",
+            "BSME",
+            "BSN",
+            "BSPH",
+            "BSPT",
+            "BSAT",
+            "BSITEC",
+            "BSCDT",
+            "BSCT",
+            "BSET",
+            "BSELT",
+            "BSFPM",
+            "BSGT",
+            "BCAED",
+            "BECE",
+            "BEED",
+            "BPED",
+            "BSEDENG",
+            "BSEDFIL",
+            "BSEDMATH",
+            "BSEDSCI",
+            "BSEDSOC",
+            "BSEDVE",
+            "BSPED",
+            "BTVTED",
+            "BTVTEDAUTO",
+            "BTVTEDCHS",
+            "BTVTEDDRAFT",
+            "BTVTEDELT",
+            "BTVTEDFSM",
+            "BTVTEDGAR",
+            "BTLED",
+            "BTLEDAGFISH",
+            "BTLEDHE",
+            "BTLEDICT",
+            "BTLEDIA",
+            "DVM",
+           
+            
+        ];
+
+            const validateButton = document.getElementById("validateBtn");
+            const errorMessage = document.getElementById('errorMessage');
+            const selectedCourse = document.getElementById('selectedCourse');
+            validateButton.addEventListener('click', (event) => {
+            const userInput = courseInput.value.trim(); // Get the input value and trim whitespace
+
+            if (validCourses.includes(userInput)) {
+                // Valid input
+                errorMessage.textContent = ''; // Clear any error message
+                selectedCourse.textContent = `Selected Course: ${userInput}`;
+            } else {
+                // Invalid input
+                errorMessage.textContent = `Error: "${userInput}" is not a valid course.`;
+                selectedCourse.textContent = ''; // Clear any previous selection
+                event.preventDefault(); // Prevent form submission
+            }
+        });
+
+        });
+        </script>
     </body>
-    <script>
-        console.log('no_result:', "<%= no_result %>");
-
-        const update_dialog = document.getElementById("update-dialog");
-        const delete_dialog = document.getElementById("delete-dialog");
-        const error_dialog = document.getElementById("error-dialog");
-        const search_dialog = document.getElementById("search-dialog");
-        const search_results = "<%= Array.isArray(search_results) && search_results.length > 0 ? 'true' : '' %>";
-
-        if (search_results) {
-            search_dialog.showModal();
-        }
-
-        function closeNoResultDialog() {
-            const dialog = document.getElementById("no-result-dialog");
-            dialog.close(); // Close the dialog
-            window.location.href='/';
-        }
-        
-        function closeStudentExistsDialog() {
-            const dialog = document.getElementById("student-exists-dialog");
-            dialog.close(); // Close the dialog
-            window.location.href='/';
-        }
-
-
-        function close_search_dialog(){
-            search_dialog.close();
-            window.location.href = '/';
-        }
-
-        function show_update_dialog(){
-            update_dialog.showModal();
-        }
-
-        function show_delete_dialog(){
-            delete_dialog.showModal();
-        }
-
-        function close_update_dialog(){
-            update_dialog.close();
-        }
-
-        function close_delete_dialog(){
-            delete_dialog.close();
-        }
-
-        function show_error_dialog(){
-            error_dialog.showModal();
-        }
-
-        function close_error_dialog(){
-            error_dialog.close();
-            window.location.href = '/';
-        }
-        // Check if there is an error and show the dialog
-        document.addEventListener('DOMContentLoaded', function() {
-        // Pass the error message from EJS to a JavaScript variable
-        const error = "<%= typeof error !== 'undefined' && error !== null ? error : '' %>";
-        
-        if (error) {
-            show_error_dialog();  // Show dialog if error exists
-        }
-        
-    });
-
-    </script>
 </html>
