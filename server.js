@@ -106,7 +106,7 @@ app.post('/add', (req, res) => {
     db.query(query_check, [email], (err, results) => {
         if (err) {
             console.error('Error checking for existing student:', err.message);
-            return res.render("index", { student: [], search_results: [], error: "Failed to add student" });
+            return res.render("index", { student: [], search_results: [], error: "Failed to add student", message: []});
         }
 
         if (results.length > 0) {
@@ -139,6 +139,24 @@ app.post('/update/:id', (req, res) => {
     const { id } = req.params;
     const { name, year, course, email } = req.body;
     const query = 'UPDATE student SET name = ?, year = ?, course = ?, email = ? WHERE id = ?';
+    const query_check = 'SELECT * FROM student WHERE email = ? ';
+
+    db.query(query_check, [email], (err, results) => {
+        if (err) {
+            console.error('Error checking for existing student:', err.message);
+            return res.render("index", { student: [], search_results: [], error: "Failed to add student", message: []});
+        }
+
+        if (results.length > 0) {
+            // Student already exists
+            return res.render('index', {
+                student: [], // Pass the main student data if needed
+                search_results: [], // No search results
+                message: 'Student with this email already exists.', // Error message
+                no_result: false // No search results
+            });
+        }
+
     db.query(query, [name, year, course, email, id], (err) => {
         if (err) {
             console.error('Error updating record:', err.message);
@@ -147,6 +165,7 @@ app.post('/update/:id', (req, res) => {
             res.redirect('/');
         }
     });
+});
 });
 
 // Delete user
